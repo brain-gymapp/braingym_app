@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>मेमरी & फोकस जिम - Brain Gym Web App</title>
+  <style>
+    :root {
+      --bg-1: #050914;
+      --bg-2: #0a1224;
+      --panel: rgba(15, 23, 42, 0.86);
+      --panel-2: rgba(11, 18, 34, 0.92);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: rgba(148, 163, 184, 0.2);
+      --teal: #10b981;
+      --teal-dark: #059669;
+      --blue: #38bdf8;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --indigo: #6366f1;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif;
+      background: radial-gradient(circle at top, #0f1f3d 0%, var(--bg-2) 45%, var(--bg-1) 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 14px;
+    }
+
+    .container {
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
+    .top-bar {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .brain-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .pill-tag {
+      background: rgba(56, 189, 248, 0.16);
+      color: var(--blue);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-sub {
+      width: 100%;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .top-right {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .timer-chip {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px 10px;
+      text-align: center;
+      min-width: 82px;
+    }
+
+    .timer-chip-lbl {
+      font-size: 0.68rem;
+      color: var(--muted);
+      display: block;
+    }
+
+    .timer-chip-val {
+      font-size: 0.92rem;
+      font-weight: 800;
+      color: var(--blue);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .lang-switch {
+      display: inline-flex;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .lang-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .lang-btn.active {
+      background: var(--blue);
+      color: #041525;
+    }
+
+    .control-strip {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .session-dots {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .dots {
+      display: inline-flex;
+      gap: 5px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: rgba(148, 163, 184, 0.3);
+    }
+
+    .dot.done {
+      background: var(--teal);
+    }
+
+    .ctrl-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .ctrl-btn {
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .ctrl-btn.amber { border-color: rgba(245, 158, 11, 0.45); color: #fbbf24; }
+    .ctrl-btn.rose { border-color: rgba(244, 63, 94, 0.45); color: #fda4af; }
+    .ctrl-btn.slate { color: var(--muted); }
+
+    .task-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      max-width: 540px;
+      margin: 0 auto 14px;
+    }
+
+    .task-tab {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 10px;
+      padding: 9px 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .task-tab.active {
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .main-stage {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px 18px;
+      text-align: center;
+    }
+
+    .stage-tag {
+      display: inline-block;
+      background: rgba(99, 102, 241, 0.18);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+
+    .stage-title {
+      font-size: 1.55rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .stage-desc {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      max-width: 480px;
+      margin: 0 auto 14px;
+    }
+
+    .metric-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .metric-lbl {
+      font-size: 0.74rem;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .metric-val {
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .metric-val.green { color: #34d399; }
+    .metric-val.blue { color: var(--blue); }
+    .metric-val.amber { color: #fbbf24; }
+
+    .prompt-banner {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      max-width: 540px;
+      margin: 0 auto 18px;
+    }
+
+    .prompt-main {
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .prompt-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .grid-3x3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      max-width: 270px;
+      margin: 0 auto 18px;
+    }
+
+    .tile-3x3 {
+      aspect-ratio: 1 / 1;
+      border-radius: 12px;
+      background: #162036;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .tile-3x3:active { transform: scale(0.95); }
+
+    .tile-3x3.lit {
+      background: #38bdf8;
+      box-shadow: 0 0 18px rgba(56, 189, 248, 0.85);
+      border-color: #e0f2fe;
+    }
+
+    .tile-3x3.ok {
+      background: #10b981;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.7);
+    }
+
+    .tile-3x3.err {
+      background: #f43f5e;
+      box-shadow: 0 0 14px rgba(244, 63, 94, 0.7);
+    }
+
+    .start-session-btn {
+      background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 11px 22px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
+    }
+
+    .choice-box {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .choice-btn {
+      border: 1px solid var(--border);
+      background: #162036;
+      color: #fff;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      min-width: 120px;
+    }
+
+    .arrow-display {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: 8px;
+      background: #080e1c;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      display: inline-block;
+      margin-bottom: 14px;
+    }
+
+    .status-msg {
+      min-height: 22px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .status-ok { color: #34d399; }
+    .status-err { color: #fb7185; }
+
+    .lock-panel {
+      padding: 26px 14px;
+    }
+
+    .lock-clock {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #fbbf24;
+      margin: 14px 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .footer-bar {
+      text-align: center;
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-top: 14px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="top-bar">
+      <div class="brand-left">
+        <div class="brain-badge">🧠</div>
+        <div class="brand-title" id="ui-brandTitle">मेमरी & फोकस जिम</div>
+        <span class="pill-tag">BRAIN GYM</span>
+        <div class="brand-sub" id="ui-brandSub">५ सेशन्स × ६ मिनिटे = ३० मिनिटे दैनिक मर्यादा</div>
+      </div>
+
+      <div class="top-right">
+        <div class="timer-chip">
+          <span class="timer-chip-lbl" id="ui-lblTaskT">टास्क (२ मि.)</span>
+          <span class="timer-chip-val" id="val-taskT">02:00</span>
+        </div>
+        <div class="timer-chip">
+          <span class="timer-chip-lbl" id="ui-lblSessT">सेशन (६ मि.)</span>
+          <span class="timer-chip-val" id="val-sessT">06:00</span>
+        </div>
+        <div class="timer-chip">
+          <span class="timer-chip-lbl" id="ui-lblDayT">दैनिक शिल्लक</span>
+          <span class="timer-chip-val" id="val-dayT">30:00</span>
+        </div>
+
+        <div class="lang-switch" role="group" aria-label="Language">
+          <button type="button" class="lang-btn active" id="btn-mr" onclick="setLanguage('mr')">मराठी</button>
+          <button type="button" class="lang-btn" id="btn-en" onclick="setLanguage('en')">EN</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="control-strip">
+      <div class="session-dots">
+        <span id="ui-sessProgText">आजची सेशन्स: 0 / 5 पूर्ण</span>
+        <div class="dots" id="session-dots"></div>
+      </div>
+
+      <div class="ctrl-actions">
+        <button type="button" class="ctrl-btn" id="btn-nextTask" onclick="nextTaskManual()">⏭ पुढचा टास्क (२ मि.)</button>
+        <button type="button" class="ctrl-btn" id="btn-finishSess" onclick="completeCurrentSession()">⏹ सेशन पूर्ण करा (६ मि.)</button>
+        <button type="button" class="ctrl-btn amber" id="btn-lock24" onclick="trigger24hLock()">🔒 २४-तास लॉक पट्टा</button>
+        <button type="button" class="ctrl-btn slate" id="btn-reset" onclick="resetDemoState()">↺ रीसेट डेमो</button>
+      </div>
+    </section>
+
+    <nav class="task-tabs" aria-label="Tasks">
+      <button type="button" class="task-tab active" id="tab-0" onclick="selectTaskTab(0)">१. मेमरी फ्लॅश</button>
+      <button type="button" class="task-tab" id="tab-1" onclick="selectTaskTab(1)">२. लॉजिक शिफ्ट</button>
+      <button type="button" class="task-tab" id="tab-2" onclick="selectTaskTab(2)">३. फोकस फिल्टर</button>
+    </nav>
+
+    <main class="main-stage" id="stage"></main>
+
+    <footer class="footer-bar" id="ui-footer">
+      मेमरी & फोकस जिम · ५ सेशन्स × ६ मिनिटे = ३० मिनिटे दैनिक मर्यादा | स्थानिक स्टोरेज (LocalStorage) सक्रिय
+    </footer>
+  </div>
+
+  <script>
+    const TEXT = {
+      mr: {
+        brandTitle: "मेमरी & फोकस जिम",
+        brandSub: "५ सेशन्स × ६ मिनिटे = ३० मिनिटे दैनिक मर्यादा",
+        lblTaskT: "टास्क (२ मि.)",
+        lblSessT: "सेशन (६ मि.)",
+        lblDayT: "दैनिक शिल्लक",
+        sessProg: (done, max) => `आजची सेशन्स: ${done} / ${max} पूर्ण`,
+        nextTaskBtn: "⏭ पुढचा टास्क (२ मि.)",
+        finishSessBtn: "⏹ सेशन पूर्ण करा (६ मि.)",
+        lock24Btn: "🔒 २४-तास लॉक पट्टा",
+        resetBtn: "↺ रीसेट डेमो",
+        tabs: ["१. मेमरी फ्लॅश", "२. लॉजिक शिफ्ट", "३. फोकस फिल्टर"],
+        stageBadge: (s, maxS, t, maxT) => `सेशन ${s} / ${maxS} • टास्क ${t} / ${maxT}`,
+        taskTitles: [
+          "मेमरी फ्लॅश (Memory Flash)",
+          "लॉजिक शिफ्ट (Logic Shift)",
+          "फोकस फिल्टर (Focus Filter)"
+        ],
+        taskDescs: [
+          "चौकटींचा रंग आणि क्रम लक्षात ठेवा व त्याच क्रमाने निवडा.",
+          "नियमानुसार (रंग किंवा आकार) योग्य पर्याय निवडा.",
+          "आजूबाजूचे बाण टाळून फक्त मधल्या बाणाची दिशा निवडा."
+        ],
+        lblScore: "एकूण गुण",
+        lblAcc: "अचूकता",
+        lblStreak: "सलग बरोबर (Streak)",
+        startPromptMain: (s) => `${s}-मिनिटांचे सेशन सुरू करण्यासाठी खालील बटण दाबा`,
+        startPromptSub: "प्रत्येक टास्क २ मिनिटे चालेल (एकूण ३ टास्क = ६ मिनिटे)",
+        startBtn: (s) => `▶ सेशन ${s} सुरू करा (06:00)`,
+        watchSeq: "चमकणाऱ्या चौकटींचा क्रम लक्षपूर्वक पहा...",
+        repeatSeq: "पाहिलेला क्रम ३×३ चौकटींमध्ये त्याच क्रमाने दाबा!",
+        seqOk: "शाब्बास! क्रम बरोबर जुळला (+१० गुण)",
+        seqErr: "क्रम चुकला! नवीन क्रम पहा...",
+        logicColorRule: "नियम: रंग जुळणारा पर्याय निवडा",
+        logicShapeRule: "नियम: आकार जुळणारा पर्याय निवडा",
+        targetPrefix: "लक्ष्य:",
+        focusRule: "फक्त मधल्या बाणाची दिशा निवडा:",
+        leftDir: "← डावीकडे",
+        rightDir: "उजवीकडे →",
+        ansOk: "बरोबर उत्तर! (+१० गुण)",
+        ansErr: "चूक! पुन्हा प्रयत्न करा",
+        lockedTitle: "२४-तासांचा लॉक सुरू आहे",
+        lockedDesc: "आजचा दैनिक व्यायाम/लॉक पूर्ण झाला आहे. २४ तासांनंतर नवीन सेशन्स सुरू होतील.",
+        offlineTip: "ऑफलाइन सराव: आज रील/शॉर्ट्स टाळून २० मिनिटे शांत वाचन किंवा चालणे करा.",
+        footer: "मेमरी & फोकस जिम · ५ सेशन्स × ६ मिनिटे = ३० मिनिटे दैनिक मर्यादा | स्थानिक स्टोरेज (LocalStorage) सक्रिय",
+        colors: { red: "लाल", blue: "निळा", green: "हिरवा", amber: "पिवळा" },
+        shapes: { circle: "वर्तुळ", square: "चौरस", triangle: "त्रिकोण" }
+      },
+      en: {
+        brandTitle: "Memory & Focus Gym",
+        brandSub: "5 Sessions × 6 min = 30 min daily limit",
+        lblTaskT: "Task (2m)",
+        lblSessT: "Session (6m)",
+        lblDayT: "Daily Left",
+        sessProg: (done, max) => `Today's Sessions: ${done} / ${max} done`,
+        nextTaskBtn: "⏭ Next Task (2m)",
+        finishSessBtn: "⏹ Complete Session (6m)",
+        lock24Btn: "🔒 24h Lock Strip",
+        resetBtn: "↺ Reset Demo",
+        tabs: ["1. Memory Flash", "2. Logic Shift", "3. Focus Filter"],
+        stageBadge: (s, maxS, t, maxT) => `Session ${s} / ${maxS} • Task ${t} / ${maxT}`,
+        taskTitles: [
+          "Memory Flash",
+          "Logic Shift",
+          "Focus Filter"
+        ],
+        taskDescs: [
+          "Watch the tile sequence in the 3×3 grid and tap in the same order.",
+          "Follow the active rule (Color or Shape) and pick the matching card.",
+          "Ignore flanking arrows and pick ONLY the middle arrow direction."
+        ],
+        lblScore: "Total Score",
+        lblAcc: "Accuracy",
+        lblStreak: "Streak",
+        startPromptMain: (s) => `Press the button below to start Session ${s}`,
+        startPromptSub: "Each task runs for 2 minutes (3 tasks = 6 minutes)",
+        startBtn: (s) => `▶ Start Session ${s} (06:00)`,
+        watchSeq: "Watch the glowing tiles carefully...",
+        repeatSeq: "Tap the tiles in the exact order you saw!",
+        seqOk: "Great! Sequence matched (+10 pts)",
+        seqErr: "Missed order! Watching a new sequence...",
+        logicColorRule: "Rule: Match the target COLOR",
+        logicShapeRule: "Rule: Match the target SHAPE",
+        targetPrefix: "Target:",
+        focusRule: "Select ONLY the direction of the middle arrow:",
+        leftDir: "← Left",
+        rightDir: "Right →",
+        ansOk: "Correct! (+10 pts)",
+        ansErr: "Try again!",
+        lockedTitle: "24-Hour Lock Active",
+        lockedDesc: "Daily limit or lock has been activated. Come back after the countdown ends.",
+        offlineTip: "Offline habit: Take a 20-minute break from fast scrolling and read or walk.",
+        footer: "Memory & Focus Gym · 5 Sessions × 6 min = 30 min daily limit | LocalStorage active",
+        colors: { red: "Red", blue: "Blue", green: "Green", amber: "Amber" },
+        shapes: { circle: "Circle", square: "Square", triangle: "Triangle" }
+      }
+    };
+
+    const COLOR_MAP = {
+      red: "#e11d48",
+      blue: "#2563eb",
+      green: "#059669",
+      amber: "#d97706"
+    };
+
+    const STORAGE_KEY = "brain_gym_v2_state";
+    const MAX_SESSIONS = 5;
+    const SESSION_SEC = 360;
+    const TASK_SEC = 120;
+    const DAILY_SEC = 1800;
+    const LOCK_MS = 24 * 60 * 60 * 1000;
+
+    let state = loadState();
+    let seqPattern = [];
+    let seqStep = 0;
+    let isShowingSeq = false;
+    let logicData = null;
+    let focusData = null;
+    let feedbackText = "";
+    let feedbackType = "";
+
+    function freshState() {
+      return {
+        lang: "mr",
+        running: false,
+        lockedUntil: null,
+        completedSessions: 0,
+        dailyUsedSec: 0,
+        sessionElapsedSec: 0,
+        taskElapsedSec: 0,
+        taskIdx: 0,
+        score: 0,
+        attempts: 0,
+        correctCount: 0,
+        streak: 0
+      };
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return freshState();
+        const parsed = { ...freshState(), ...JSON.parse(raw) };
+        if (parsed.lockedUntil && Date.now() >= parsed.lockedUntil) {
+          return { ...freshState(), lang: parsed.lang };
+        }
+        return parsed;
+      } catch {
+        return freshState();
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch {}
+    }
+
+    function tr() {
+      return TEXT[state.lang] || TEXT.mr;
+    }
+
+    function fmtMMSS(sec) {
+      const s = Math.max(0, Math.floor(sec));
+      return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+    }
+
+    function fmtHHMMSS(ms) {
+      const s = Math.max(0, Math.floor(ms / 1000));
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      const r = s % 60;
+      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(r).padStart(2, "0")}`;
+    }
+
+    function setLanguage(lang) {
+      state.lang = lang;
+      saveState();
+      syncChrome();
+      renderStage(false);
+    }
+
+    function selectTaskTab(idx) {
+      state.taskIdx = idx;
+      state.taskElapsedSec = 0;
+      feedbackText = "";
+      saveState();
+      syncChrome();
+      renderStage(true);
+    }
+
+    function startSessionNow() {
+      if (state.lockedUntil && Date.now() < state.lockedUntil) return;
+      state.running = true;
+      feedbackText = "";
+      saveState();
+      syncChrome();
+      renderStage(true);
+    }
+
+    function nextTaskManual() {
+      if (state.lockedUntil && Date.now() < state.lockedUntil) return;
+      if (state.taskIdx < 2) {
+        state.taskIdx += 1;
+        state.taskElapsedSec = 0;
+        feedbackText = "";
+        saveState();
+        syncChrome();
+        renderStage(true);
+      } else {
+        completeCurrentSession();
+      }
+    }
+
+    function completeCurrentSession() {
+      if (state.lockedUntil && Date.now() < state.lockedUntil) return;
+      state.completedSessions = Math.min(MAX_SESSIONS, state.completedSessions + 1);
+      state.dailyUsedSec = Math.min(DAILY_SEC, state.dailyUsedSec + Math.max(1, state.sessionElapsedSec || SESSION_SEC));
+      state.sessionElapsedSec = 0;
+      state.taskElapsedSec = 0;
+      state.taskIdx = 0;
+      state.running = false;
+      feedbackText = "";
+
+      if (state.completedSessions >= MAX_SESSIONS || state.dailyUsedSec >= DAILY_SEC) {
+        state.lockedUntil = Date.now() + LOCK_MS;
+      }
+      saveState();
+      syncChrome();
+      renderStage(true);
+    }
+
+    function trigger24hLock() {
+      state.running = false;
+      state.lockedUntil = Date.now() + LOCK_MS;
+      saveState();
+      syncChrome();
+      renderStage(false);
+    }
+
+    function resetDemoState() {
+      const keepLang = state.lang;
+      state = { ...freshState(), lang: keepLang };
+      seqPattern = [];
+      logicData = null;
+      focusData = null;
+      feedbackText = "";
+      saveState();
+      syncChrome();
+      renderStage(true);
+    }
+
+    function syncChrome() {
+      const t = tr();
+      document.documentElement.lang = state.lang;
+      document.getElementById("btn-mr").classList.toggle("active", state.lang === "mr");
+      document.getElementById("btn-en").classList.toggle("active", state.lang === "en");
+
+      document.getElementById("ui-brandTitle").textContent = t.brandTitle;
+      document.getElementById("ui-brandSub").textContent = t.brandSub;
+      document.getElementById("ui-lblTaskT").textContent = t.lblTaskT;
+      document.getElementById("ui-lblSessT").textContent = t.lblSessT;
+      document.getElementById("ui-lblDayT").textContent = t.lblDayT;
+      document.getElementById("ui-sessProgText").textContent = t.sessProg(state.completedSessions, MAX_SESSIONS);
+
+      document.getElementById("btn-nextTask").textContent = t.nextTaskBtn;
+      document.getElementById("btn-finishSess").textContent = t.finishSessBtn;
+      document.getElementById("btn-lock24").textContent = t.lock24Btn;
+      document.getElementById("btn-reset").textContent = t.resetBtn;
+      document.getElementById("ui-footer").textContent = t.footer;
+
+      [0, 1, 2].forEach((i) => {
+        const el = document.getElementById(`tab-${i}`);
+        el.textContent = t.tabs[i];
+        el.classList.toggle("active", i === state.taskIdx);
+      });
+
+      const dotsWrap = document.getElementById("session-dots");
+      dotsWrap.innerHTML = Array.from({ length: MAX_SESSIONS }, (_, i) =>
+        `<span class="dot ${i < state.completedSessions ? "done" : ""}"></span>`
+      ).join("");
+
+      updateTimers();
+    }
+
+    function updateTimers() {
+      const taskRem = Math.max(0, TASK_SEC - state.taskElapsedSec);
+      const sessRem = Math.max(0, SESSION_SEC - state.sessionElapsedSec);
+      const dayRem = Math.max(0, DAILY_SEC - state.dailyUsedSec);
+
+      document.getElementById("val-taskT").textContent = fmtMMSS(taskRem);
+      document.getElementById("val-sessT").textContent = fmtMMSS(sessRem);
+      document.getElementById("val-dayT").textContent = fmtMMSS(dayRem);
+
+      const lockClock = document.getElementById("lock-clock-val");
+      if (lockClock && state.lockedUntil) {
+        lockClock.textContent = fmtHHMMSS(state.lockedUntil - Date.now());
+      }
+    }
+
+    function renderStage(rebuildRound = false) {
+      const t = tr();
+      const stage = document.getElementById("stage");
+
+      if (state.lockedUntil && Date.now() < state.lockedUntil) {
+        stage.innerHTML = `
+          <div class="lock-panel">
+            <span class="stage-tag">24H LOCK</span>
+            <h2 class="stage-title">${t.lockedTitle}</h2>
+            <p class="stage-desc">${t.lockedDesc}</p>
+            <div class="lock-clock" id="lock-clock-val">${fmtHHMMSS(state.lockedUntil - Date.now())}</div>
+            <div class="prompt-banner">
+              <div class="prompt-main">${t.offlineTip}</div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const acc = state.attempts > 0 ? Math.round((state.correctCount / state.attempts) * 100) : 100;
+      const curSessNum = Math.min(MAX_SESSIONS, state.completedSessions + 1);
+
+      stage.innerHTML = `
+        <span class="stage-tag">${t.stageBadge(curSessNum, MAX_SESSIONS, state.taskIdx + 1, 3)}</span>
+        <h1 class="stage-title">${t.taskTitles[state.taskIdx]}</h1>
+        <p class="stage-desc">${t.taskDescs[state.taskIdx]}</p>
+
+        <div class="metrics-row">
+          <div class="metric-card">
+            <div class="metric-lbl">${t.lblScore}</div>
+            <div class="metric-val green">${state.score}</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-lbl">${t.lblAcc}</div>
+            <div class="metric-val blue">${acc}%</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-lbl">${t.lblStreak}</div>
+            <div class="metric-val amber">${state.streak}</div>
+          </div>
+        </div>
+
+        <div class="prompt-banner">
+          <div class="prompt-main" id="prompt-main-txt"></div>
+          <div class="prompt-sub" id="prompt-sub-txt"></div>
+        </div>
+
+        <div id="interactive-area"></div>
+        <div class="status-msg ${feedbackType}" id="status-msg">${feedbackText}</div>
+      `;
+
+      if (!state.running) {
+        document.getElementById("prompt-main-txt").textContent = t.startPromptMain(curSessNum);
+        document.getElementById("prompt-sub-txt").textContent = t.startPromptSub;
+        document.getElementById("interactive-area").innerHTML = `
+          <div class="grid-3x3">
+            ${Array.from({ length: 9 }, (_, i) => `<div class="tile-3x3" data-idx="${i}"></div>`).join("")}
+          </div>
+          <button type="button" class="start-session-btn" onclick="startSessionNow()">
+            ${t.startBtn(curSessNum)}
+          </button>
+        `;
+        return;
+      }
+
+      if (state.taskIdx === 0) {
+        renderMemoryGrid(rebuildRound);
+      } else if (state.taskIdx === 1) {
+        renderLogicRound(rebuildRound);
+      } else {
+        renderFocusRound(rebuildRound);
+      }
+    }
+
+    function setFeedback(msg, type = "") {
+      feedbackText = msg;
+      feedbackType = type;
+      const el = document.getElementById("status-msg");
+      if (el) {
+        el.textContent = msg;
+        el.className = `status-msg ${type}`;
+      }
+    }
+
+    function recordResult(isOk, okMsg, errMsg) {
+      state.attempts += 1;
+      if (isOk) {
+        state.correctCount += 1;
+        state.streak += 1;
+        state.score += 10;
+        setFeedback(okMsg, "status-ok");
+      } else {
+        state.streak = 0;
+        setFeedback(errMsg, "status-err");
+      }
+      saveState();
+      renderStage(false);
+    }
+
+    // Task 0: Memory Flash on 3x3 grid
+    function renderMemoryGrid(makeNew) {
+      const t = tr();
+      if (makeNew || seqPattern.length === 0) {
+        const len = 3 + Math.floor(Math.random() * 2);
+        seqPattern = Array.from({ length: len }, () => Math.floor(Math.random() * 9));
+      }
+      seqStep = 0;
+      isShowingSeq = true;
+
+      document.getElementById("prompt-main-txt").textContent = t.watchSeq;
+      document.getElementById("prompt-sub-txt").textContent = "";
+
+      document.getElementById("interactive-area").innerHTML = `
+        <div class="grid-3x3" id="mem-grid">
+          ${Array.from({ length: 9 }, (_, i) =>
+            `<button type="button" class="tile-3x3" id="m-tile-${i}" onclick="onMemoryTile(${i})"></button>`
+          ).join("")}
+        </div>
+      `;
+
+      let idx = 0;
+      const timer = setInterval(() => {
+        if (!state.running || state.taskIdx !== 0 || (state.lockedUntil && Date.now() < state.lockedUntil)) {
+          clearInterval(timer);
+          return;
+        }
+        document.querySelectorAll("#mem-grid .tile-3x3").forEach((el) => el.classList.remove("lit"));
+        if (idx < seqPattern.length) {
+          const tile = document.getElementById(`m-tile-${seqPattern[idx]}`);
+          if (tile) tile.classList.add("lit");
+          idx += 1;
+        } else {
+          clearInterval(timer);
+          isShowingSeq = false;
+          const pMain = document.getElementById("prompt-main-txt");
+          if (pMain) pMain.textContent = t.repeatSeq;
+        }
+      }, 600);
+    }
+
+    function onMemoryTile(tileIdx) {
+      if (!state.running || isShowingSeq || state.taskIdx !== 0) return;
+      const t = tr();
+      const tile = document.getElementById(`m-tile-${tileIdx}`);
+
+      if (tileIdx === seqPattern[seqStep]) {
+        if (tile) {
+          tile.classList.add("ok");
+          setTimeout(() => tile.classList.remove("ok"), 180);
+        }
+        seqStep += 1;
+        if (seqStep === seqPattern.length) {
+          recordResult(true, t.seqOk, t.seqErr);
+          setTimeout(() => {
+            if (state.running && state.taskIdx === 0) renderMemoryGrid(true);
+          }, 550);
+        }
+      } else {
+        if (tile) {
+          tile.classList.add("err");
+          setTimeout(() => tile.classList.remove("err"), 250);
+        }
+        recordResult(false, t.seqOk, t.seqErr);
+        setTimeout(() => {
+          if (state.running && state.taskIdx === 0) renderMemoryGrid(true);
+        }, 650);
+      }
+    }
+
+    // Task 1: Logic Shift
+    function renderLogicRound(makeNew) {
+      const t = tr();
+      const cKeys = Object.keys(COLOR_MAP);
+      const sKeys = Object.keys(t.shapes);
+
+      if (makeNew || !logicData) {
+        const rule = Math.random() < 0.5 ? "color" : "shape";
+        const targetColor = cKeys[Math.floor(Math.random() * cKeys.length)];
+        const targetShape = sKeys[Math.floor(Math.random() * sKeys.length)];
+        const options = [{ color: targetColor, shape: targetShape, ok: true }];
+
+        while (options.length < 3) {
+          const c = cKeys[Math.floor(Math.random() * cKeys.length)];
+          const s = sKeys[Math.floor(Math.random() * sKeys.length)];
+          const matches = rule === "color" ? c === targetColor : s === targetShape;
+          if (!matches) options.push({ color: c, shape: s, ok: false });
+        }
+        options.sort(() => Math.random() - 0.5);
+        logicData = { rule, targetColor, targetShape, options };
+      }
+
+      document.getElementById("prompt-main-txt").textContent =
+        logicData.rule === "color" ? t.logicColorRule : t.logicShapeRule;
+      const targetVal =
+        logicData.rule === "color" ? t.colors[logicData.targetColor] : t.shapes[logicData.targetShape];
+      document.getElementById("prompt-sub-txt").textContent = `${t.targetPrefix} ${targetVal}`;
+
+      document.getElementById("interactive-area").innerHTML = `
+        <div class="choice-box">
+          ${logicData.options.map((opt, idx) => `
+            <button type="button" class="choice-btn" style="background:${COLOR_MAP[opt.color]};" onclick="onLogicChoice(${idx})">
+              ${t.shapes[opt.shape]}<br><span style="font-size:0.78rem;">(${t.colors[opt.color]})</span>
+            </button>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function onLogicChoice(idx) {
+      if (!state.running || state.taskIdx !== 1 || !logicData) return;
+      const t = tr();
+      const chosen = logicData.options[idx];
+      if (chosen && chosen.ok) {
+        recordResult(true, t.ansOk, t.ansErr);
+        setTimeout(() => {
+          if (state.running && state.taskIdx === 1) renderLogicRound(true);
+        }, 400);
+      } else {
+        recordResult(false, t.ansOk, t.ansErr);
+      }
+    }
+
+    // Task 2: Focus Filter
+    function renderFocusRound(makeNew) {
+      const t = tr();
+      if (makeNew || !focusData) {
+        const mid = Math.random() < 0.5 ? "left" : "right";
+        const flank = Math.random() < 0.5 ? "left" : "right";
+        focusData = { mid, flank };
+      }
+
+      const sym = (d) => (d === "left" ? "←" : "→");
+      document.getElementById("prompt-main-txt").textContent = t.focusRule;
+      document.getElementById("prompt-sub-txt").textContent = "";
+
+      document.getElementById("interactive-area").innerHTML = `
+        <div class="arrow-display">
+          ${sym(focusData.flank)} ${sym(focusData.flank)} <span style="color:#38bdf8;">${sym(focusData.mid)}</span> ${sym(focusData.flank)} ${sym(focusData.flank)}
+        </div>
+        <div class="choice-box">
+          <button type="button" class="choice-btn" onclick="onFocusChoice('left')">${t.leftDir}</button>
+          <button type="button" class="choice-btn" onclick="onFocusChoice('right')">${t.rightDir}</button>
+        </div>
+      `;
+    }
+
+    function onFocusChoice(dir) {
+      if (!state.running || state.taskIdx !== 2 || !focusData) return;
+      const t = tr();
+      if (dir === focusData.mid) {
+        recordResult(true, t.ansOk, t.ansErr);
+        setTimeout(() => {
+          if (state.running && state.taskIdx === 2) renderFocusRound(true);
+        }, 350);
+      } else {
+        recordResult(false, t.ansOk, t.ansErr);
+      }
+    }
+
+    // Clock loop
+    setInterval(() => {
+      if (state.lockedUntil && Date.now() >= state.lockedUntil) {
+        state = { ...freshState(), lang: state.lang };
+        saveState();
+        syncChrome();
+        renderStage(true);
+        return;
+      }
+
+      if (state.running && (!state.lockedUntil || Date.now() >= state.lockedUntil)) {
+        state.sessionElapsedSec += 1;
+        state.taskElapsedSec += 1;
+        state.dailyUsedSec = Math.min(DAILY_SEC, state.dailyUsedSec + 1);
+
+        if (state.sessionElapsedSec >= SESSION_SEC || state.dailyUsedSec >= DAILY_SEC) {
+          completeCurrentSession();
+          return;
+        }
+        if (state.taskElapsedSec >= TASK_SEC) {
+          state.taskElapsedSec = 0;
+          state.taskIdx = (state.taskIdx + 1) % 3;
+          saveState();
+          syncChrome();
+          renderStage(true);
+          return;
+        }
+        saveState();
+      }
+      updateTimers();
+    }, 1000);
+
+    // Boot
+    syncChrome();
+    renderStage(true);
+  </script>
+</body>
+</html>
